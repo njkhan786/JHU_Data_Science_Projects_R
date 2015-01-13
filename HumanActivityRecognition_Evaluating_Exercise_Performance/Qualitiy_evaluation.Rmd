@@ -1,0 +1,38 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+Evaluating qualities of exercise with fitband data
+- a machine learning solution
+
+Emma Yu
+
+Jan 2015
+
+This is a course project for the practical machine learning class from JHU on Coursera. The data for this project is published in a conference proceeding: Wearable Computing: Accelerometers' Data Classification of Body Postures and Movements. The data is kindly made available by the authors at <http://groupware.les.inf.puc-rio.br/har>.
+
+First, let's download the training and testing data set from: 
+```{r}
+download.file('https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv', 
+              "pml-training.csv", method = "curl")
+download.file('https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv', 
+              "pml-testing.csv", method = "curl")
+
+training <- read.csv("pml-training.csv")
+testing <- read.csv("pml-testing.csv")
+```
+
+Personal health band. Many effort has been put into recognizing the type of exciecising, but people don't usually evaluate the correctness and effectiveness of the exercise. The goal of this project is to use controled data to train the algorithm to learn to evaluate exercise quality.
+
+
+data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.
+
+More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset). 
+
+The goal of your project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases. 
+
+1. Your submission should consist of a link to a Github repo with your R markdown and compiled HTML file describing your analysis. Please constrain the text of the writeup to < 2000 words and the number of figures to be less than 5. It will make it easier for the graders if you submit a repo with a gh-pages branch so the HTML page can be viewed online (and you always want to make it easy on graders :-).
+2. You should also apply your machine learning algorithm to the 20 test cases available in the test data above. Please submit your predictions in appropriate format to the programming assignment for automated grading. See the programming assignment for additional details. 
+
+
