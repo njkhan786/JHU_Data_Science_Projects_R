@@ -26,6 +26,9 @@ shinyServer(
       pred$mpg <- predict(fit, pred)
       
       ggplot(data, aes(wt, mpg)) +
+        ggtitle('Estimation of the MPG') +
+        xlab('Weight (in ton)') +
+        ylab('MPG (miles per gallon)') +
         geom_smooth(method = lm)  +
         geom_point(data = pred, aes(wt, mpg), colour =2, size =10) +
         geom_text(x = pred$wt+0.5, y=pred$mpg, label = 'Predicted MPG is') + 
