@@ -1,38 +1,111 @@
 ---
-title: "Untitled"
+title: "Predicting exercise quality with random forest"
 output: html_document
 ---
 
-Evaluating qualities of exercise with fitband data
-- a machine learning solution
+This is a course project for the practical machine learning class from JHU on Coursera. The data for this project is published in a conference proceeding: Wearable Computing: Accelerometers' Data Classification of Body Postures and Movements. The data is kindly made available by the authors at <http://groupware.les.inf.puc-rio.br/har>.
 
 Emma Yu
 
 Jan 2015
 
-This is a course project for the practical machine learning class from JHU on Coursera. The data for this project is published in a conference proceeding: Wearable Computing: Accelerometers' Data Classification of Body Postures and Movements. The data is kindly made available by the authors at <http://groupware.les.inf.puc-rio.br/har>.
+
+#### Introduction
+
+Many effort has been put into recognizing the type of exciecising, but people don't usually evaluate the correctness and effectiveness of the exercise. The goal of this project is to use controled data to train the algorithm to learn to evaluate exercise quality. Data is gathered from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset). 
+
+
+#### Data Processing
 
 First, let's download the training and testing data set from: 
-```{r}
+```{r, eval=FALSE}
 download.file('https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv', 
               "pml-training.csv", method = "curl")
 download.file('https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv', 
               "pml-testing.csv", method = "curl")
 
-training <- read.csv("pml-training.csv")
-testing <- read.csv("pml-testing.csv")
 ```
 
-Personal health band. Many effort has been put into recognizing the type of exciecising, but people don't usually evaluate the correctness and effectiveness of the exercise. The goal of this project is to use controled data to train the algorithm to learn to evaluate exercise quality.
+
+In my experiments, I found using 10% of the training dataset provides 88% prediction accuracy.  Since increasing the amount of training data will increase the running time dramatically, and the 88% accuracy is already acceptable. I decided to use only 10 percent of the training data set to build our model for prediction.
+
+```{r, eval=TRUE}
+# Subset 10% of the data
+training <- read.csv("pml-training.csv")
+testing <- read.csv("pml-testing.csv")
+
+library(caret)
+insmall <- createDataPartition(y = training$classe,
+                               p = 0.90, list = FALSE)
+smdata <- training[-insmall,]
+
+# First only extract accelerator data
+names <- names(smdata)
+acc <- grep('acc', names)
+acc <- c(acc, grep('classe', names))
+smacc <- smdata[acc]
+#head(smacc)
+
+namesacc <- names(smacc)
+varacc <- grep('var', namesacc)
+smacc <- smacc[-varacc]
+#head(smacc)
+```
+
+#### Building the model
+
+After several experiment, I found random forest can achieve decent performace with a relative small amount of data. The algorithm takes 367.261s in total to process.
+
+```{r, cache=TRUE}
+system.time(modFit <- train(classe ~., data = smacc, method ='rf', prox = TRUE))
+modFit$finalModel
+```
+
+#### Model testing
+
+We testing the algorithm with test data ramdomply selected from the original dataset, and clean the data as the training set.
+
+```{r, cache=TRUE}
+test <- createDataPartition(y = training$classe,
+                            p = 0.9, list = FALSE)
+testdata <- training[-test,]
+
+# clean just as the training dataset
+names <- names(testdata)
+acc <- grep('acc', names)
+acc <- c(acc, grep('classe', names))
+smtest <- testdata[,acc]
+
+namesacc <- names(smtest)
+vartest <- grep('var', namesacc)
+smtest <- smtest[-vartest]
+#head(smtest)
+
+pred <- predict(modFit, smtest)
+smtest$predRight <- pred == smtest$classe
+table(pred, smtest$classe)
+```
+
+The estimation of the out-of-sample accurracy is:
+```{r}
+sum(smtest$predRight)/1960.
+```
 
 
-data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.
+#### Model prediction
 
-More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset). 
+```{r}
+# clean just as the training dataset
+names <- names(testing)
+acc <- grep('acc', names)
+acc <- c(acc, grep('classe', names))
+smtesting <- testing[,acc]
 
-The goal of your project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. You may use any of the other variables to predict with. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases. 
+namesacc <- names(smtesting)
+vartest <- grep('var', namesacc)
+smtestting <- smtesting[-vartest]
+#head(smtest)
 
-1. Your submission should consist of a link to a Github repo with your R markdown and compiled HTML file describing your analysis. Please constrain the text of the writeup to < 2000 words and the number of figures to be less than 5. It will make it easier for the graders if you submit a repo with a gh-pages branch so the HTML page can be viewed online (and you always want to make it easy on graders :-).
-2. You should also apply your machine learning algorithm to the 20 test cases available in the test data above. Please submit your predictions in appropriate format to the programming assignment for automated grading. See the programming assignment for additional details. 
-
+predict(modFit, smtesting)
+```
 

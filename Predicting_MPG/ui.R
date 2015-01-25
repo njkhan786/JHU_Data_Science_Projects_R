@@ -18,7 +18,7 @@ shinyUI(
     mainPanel(
       # Introduction
       h3('How it works:'),
-      p('This program predicts the MPG of a car in the 70s based on data from 1974 
+      p('This program predicts the MPG of a car in the 70s based on data from the 1974 
         Motor Trend US magazines. Please select the transmission and weight 
         of the car you want to predict in the left penal. The predicted MPG 
         and the general trend of MPG for cars of various weight will be shown 
