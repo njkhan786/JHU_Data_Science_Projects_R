@@ -164,9 +164,19 @@ vartest &lt;- grep('var', namesacc)
 smtestting &lt;- smtesting[-vartest]
 #head(smtest)
 
-predict(modFit, smtesting)</code></pre>
-<pre><code>##  [1] C A C A C E D B A A A A B A E B A B C B
-## Levels: A B C D E</code></pre>
+answers &lt;- predict(modFit, smtesting)</code></pre>
+<pre><code>## Loading required package: randomForest
+## randomForest 4.6-10
+## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre class="r"><code>pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0(&quot;problem_id_&quot;,i,&quot;.txt&quot;)
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+pml_write_files(answers)</code></pre>
 </div>
 
 
